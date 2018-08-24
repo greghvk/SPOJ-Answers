@@ -35,7 +35,7 @@
 #include <cmath>
 #include <sstream>
 
-
+//FC - returns true if you can place cows with minimum distance of x, false if not
 bool Fc(std::vector<long long> pos, long long x, long long N, long long cowsAmount)
 {
     long lastpos = pos[0];
@@ -82,6 +82,7 @@ int main()
         
         start=0, end=stalls[N-1]-stalls[0]+1;
         
+        //Binary search to find maximum minimal distance between cows
         while(end-start>1)
         {
             mid=floor((start+end)/2);

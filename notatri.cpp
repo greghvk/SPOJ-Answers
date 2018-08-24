@@ -1,29 +1,31 @@
-//problem - https://www.spoj.com/problems/NOTATRI/
+//problem - https://www.spoj.com/problems/AGGRCOW/
 
 /*
- You have N (3 ≤ N ≤ 2,000) wooden sticks, which are labeled from 1 to N. The i-th stick has a length of Li (1 ≤ Li ≤ 1,000,000). Your friend has challenged you to a simple game: you will pick three sticks at random, and if your friend can form a triangle with them (degenerate triangles included), he wins; otherwise, you win. You are not sure if your friend is trying to trick you, so you would like to determine your chances of winning by computing the number of ways you could choose three sticks (regardless of order) such that it is impossible to form a triangle with them.
+ Farmer John has built a new long barn, with N (2 <= N <= 100,000) stalls. The stalls are located along a straight line at positions x1,...,xN (0 <= xi <= 1,000,000,000).
  
+ His C (2 <= C <= N) cows don't like this barn layout and become aggressive towards each other once put into a stall. To prevent the cows from hurting each other, FJ wants to assign the cows to the stalls, such that the minimum distance between any two of them is as large as possible. What is the largest minimum distance?
  Input
  
- The input file consists of multiple test cases. Each test case starts with the single integer N, followed by a line with the integers L1, ..., LN. The input is terminated with N = 0, which should not be processed.
- 
+ t – the number of test cases, then t test cases follows.
+ * Line 1: Two space-separated integers: N and C
+ * Lines 2..N+1: Line i+1 contains an integer stall location, xi
  Output
  
- For each test case, output a single line containing the number of triples.
+ For each test case output one integer: the largest minimum distance.
+ Example
  
  Input:
- 3
- 4 2 10
- 3
- 1 2 3
- 4
- 5 2 9 6
- 0
  
- Output:
  1
- 0
+ 5 3
+ 1
  2
+ 8
+ 4
+ 9
+ Output:
+ 
+ 3
  */
 
 
@@ -33,66 +35,62 @@
 #include <cmath>
 #include <sstream>
 
-//fc returns 1 if you can't form triangle (degenerate included) from three sticks, where thirdStick is always the longest
-bool fc(long firstStick, long secondStick, long thirdStick){
-    if(firstStick+secondStick<thirdStick){
-        return 1;
-    }else return 0;
-};
-
-
-int main(){
+//FC - returns true if you can place cows with minimum distance of x, false if not
+bool Fc(std::vector<long long> pos, long long x, long long N, long long cowsAmount)
+{
+    long lastpos = pos[0];
+    long placedCows = 1;
     
-    long n, start, end, mid = 0;
-    long buffer;
-    std::vector<long> sticks;
-    
-    while(std::cin>>n)
+    for(int i=0;i<N;i++)
     {
-        long long searchedCases = 0;
-        for (int i = 0; i < n; i++)
+        if (pos[i]-lastpos>=x)
         {
-            scanf("%ld", &buffer);
-            sticks.push_back(buffer);
-        };
-        std::sort(sticks.begin(), sticks.end());
-        
-        for (int i=1; i<n-1; i++)
-        {
-            for (int j=0; j<i; j++)
+            lastpos=pos[i];
+            placedCows++;
+            if (placedCows==cowsAmount)
             {
-                
-                
-                start=i+1, end=n-1;
-                mid = floor((start+end)/2);
-                
-                //if you can't form a triangle at start, the binary search won't find the case - so I check the leftmost case
-                
-                while (end-start>1)
-                {
-                       ((fc(sticks[i], sticks[j], sticks[mid])?end:start)=mid);
-                       mid = floor((start+end)/2);
-                };
-                
-                if(fc(sticks[i], sticks[j], sticks[end-1]))
-                {
-                    searchedCases+=n-end+1;
-                
-                };
-                
-                if(fc(sticks[i], sticks[j], sticks[end]))
-                {
-                    searchedCases+=n-end;
-                    
-                };
-
-                  
-                
-            }
-        }
-        std::cout<<searchedCases<<std::endl;
-        sticks.clear();
-    }
-     
+                return 1;
+            };
+        };
+    };
+    
     return 0;
 };
+
+int main()
+{
+    int cases, N, n2;
+    long long c, buffer;
+    long long start, end, mid;
+    std::cin>> cases;
+    std::vector<long long> stalls;
+    std::string line;
+    
+    while(cases--)
+    {
+        
+        scanf("%d%lld",&N,&c);
+        
+        n2=N;
+        
+        while(n2--)
+        {
+            std::cin>>buffer;
+            stalls.push_back(buffer);
+        }
+        std::sort (stalls.begin(),stalls.end());
+        
+        start=0, end=stalls[N-1]-stalls[0]+1;
+        
+        //Binary search to find maximum minimal distance between cows
+        while(end-start>1)
+        {
+            mid=floor((start+end)/2);
+            (Fc(stalls, mid, N, c)?start:end)=mid;
+        }
+        std::cout<<start;
+        stalls.clear();
+        
+    };
+};
+
